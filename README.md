@@ -46,39 +46,38 @@ from pybricks.tools import wait, StopWatch
 #Se inicializa el EV3
 ev3 = EV3Brick()
 
-# #Se inicializan los notores conectados a las llantas
+#Se inicializan los notores conectados a las llantas
 left_motor = Motor(Port.D)
 right_motor = Motor(Port.A)
 
-# Se inicializa el motor conectado a los brazos
+#Se inicializa el motor conectado a los brazos
 arm_motor = Motor(Port.B)
 
-# Se inicialiaza el giroscopio
+#Se inicialiaza el giroscopio
 gyro_sensor = GyroSensor(Port.S2)
 
-# Se inicializa el sensor ultrasónico
+#Se inicializa el sensor ultrasónico
 ultrasonic_sensor = UltrasonicSensor(Port.S4)
 
-# Se inicializan los timers
+#Se inicializan los timers
 fall_timer = StopWatch()
 single_loop_timer = StopWatch()
 control_loop_timer = StopWatch()
 action_timer = StopWatch()
 
-
-# Constantes empleadas en el control del programa.
+#Constantes empleadas en el control del programa.
 GYRO_CALIBRATION_LOOP_COUNT = 200
 GYRO_OFFSET_FACTOR = 0.0005
 TARGET_LOOP_PERIOD = 15  # ms
 ARM_MOTOR_SPEED = 600  # deg/s
 
-# BANDERA QUE PERMITE ALTERNAR ENTRE MODOS
+#BANDERA QUE PERMITE ALTERNAR ENTRE MODOS
 bandera = 0
 
-# Acciones que cambian la dirección del robot
+#Acciones que cambian la dirección del robot
 Action = namedtuple('Action ', ['drive_speed', 'steering'])
 
-# Acciones predefinidas
+#Acciones predefinidas
 STOP = Action(drive_speed=0, steering=0)
 FORWARD_SLOW = Action(drive_speed=40, steering=0)
 BACKWARD_SLOW = Action(drive_speed=-10, steering=0)
@@ -86,7 +85,7 @@ TURN_RIGHT = Action(drive_speed=0, steering=70)
 TURN_LEFT = Action(drive_speed=0, steering=-70)
 
 
-# Funciones para el movimiento del robot.
+#Funciones para el movimiento del robot.
 def move_forward():
     return FORWARD_SLOW
 
@@ -99,8 +98,7 @@ def turn_left():
 def turn_right():
     return TURN_RIGHT
 
-
-# Función para monitorear los brazos del robot
+#Función para monitorear los brazos del robot
 def update_action():
     arm_motor.reset_angle(0)
     action_timer.reset()
@@ -113,13 +111,13 @@ def update_action():
     action = STOP
     yield action
 
-    # Configuración "Por Defecto" del robot, en esta irá siempre hacia delante, y en caso de detectar un obstáculo 
-    # con el sensor ultrasónico girará a la derecha o izqueirda de forma aleatoria.
+    #Configuración "Por Defecto" del robot, en esta irá siempre hacia delante, y en caso de detectar un obstáculo 
+    #con el sensor ultrasónico girará a la derecha o izqueirda de forma aleatoria.
 
     if bandera == 0:
         while True:
 
-            # Si la medida del sensor es menor a 70 (obstáculo cercano), se irá para atrás y girara en una dirección
+            #Si la medida del sensor es menor a 70 (obstáculo cercano), se irá para atrás y girara en una dirección
             if ultrasonic_sensor.distance() < 70:
                 
                 yield move_backward()
@@ -155,9 +153,9 @@ def update_action():
             while action_timer.time() < 100:
                 yield
 
-    # Modo de Programación de rutinas
-    # Es posible modificar las acciones del robot, así como el tiempo que las ejecutará, para ello solo hay que 
-    # eliminar y/o agrear acciones.
+    #Modo de Programación de rutinas
+    #Es posible modificar las acciones del robot, así como el tiempo que las ejecutará, para ello solo hay que 
+    #eliminar y/o agrear acciones.
 
     if bandera==1:
         while True:
@@ -186,19 +184,19 @@ def update_action():
             yield action
             
           
-# Función para detener el motor y el speaker
+#Función para detener el motor y el speaker
 def stop_action():
     ev3.speaker.beep(0, -1)
     arm_motor.run_target(ARM_MOTOR_SPEED, 0)
 
 
 while True:
-    # Los ojos dormidos y la luz apagada nos permiten saber que el robot está esperando que se 
-    # detenga cualquier movimiento antes de que el programa pueda continuar.
+    #Los ojos dormidos y la luz apagada nos permiten saber que el robot está esperando que se 
+    #detenga cualquier movimiento antes de que el programa pueda continuar.
     ev3.screen.load_image(ImageFile.SLEEPING)
     ev3.light.off()
 
-    # Se resetean los valores de los motores y el timer fall
+    #Se resetean los valores de los motores y el timer fall
     left_motor.reset_angle(0)
     right_motor.reset_angle(0)
     fall_timer.reset()
@@ -210,8 +208,8 @@ while True:
     control_loop_count = 0
     robot_body_angle = -0.25
 
-    # Dado que update_action() es un generador (usa "rendimiento" en lugar de "retorno"),
-    # en realidad no ejecuta update_action() en este momento, sino que lo prepara para su uso más adelante.
+    #Dado que update_action() es un generador (usa "rendimiento" en lugar de "retorno"),
+    #en realidad no ejecuta update_action() en este momento, sino que lo prepara para su uso más adelante.
     
     action_task = update_action()
 
@@ -235,12 +233,12 @@ while True:
             break
     gyro_offset = gyro_sum / GYRO_CALIBRATION_LOOP_COUNT
 
-    # Los ojos despiertos y la luz verde nos permiten saber que el robot está listo para funcionar!
+    #Los ojos despiertos y la luz verde nos permiten saber que el robot está listo para funcionar!
     ev3.speaker.play_file(SoundFile.SPEED_UP)
     ev3.screen.load_image(ImageFile.AWAKE)
     ev3.light.on(Color.GREEN)
 
-    # Lazo de control principal para equilibrar el robot.
+    #Lazo de control principal para equilibrar el robot.
     while True:
 
         # Este temporizador mide cuánto dura un solo bucle. Esto se utilizará para 
@@ -307,22 +305,36 @@ while True:
         # de salida anterior depende de tener una cierta cantidad de tiempo en cada bucle.
         wait(TARGET_LOOP_PERIOD - single_loop_timer.time())
 
-    # Código para caída del robot
+    #Código para caída del robot
 
-    # Stop all of the motors.
+    #Stop all of the motors.
     stop_action()
     left_motor.stop()
     right_motor.stop()
 
-    # Los ojos rotos y la luz roja nos hacen saber que el robot perdió el equilibrio.
+    #Los ojos rotos y la luz roja nos hacen saber que el robot perdió el equilibrio.
     ev3.light.on(Color.RED)
     ev3.screen.load_image(ImageFile.KNOCKED_OUT)
     ev3.speaker.play_file(SoundFile.SPEED_DOWN)
 
-    # Espere unos segundos antes de intentar equilibrar nuevamente.
+    #Espere unos segundos antes de intentar equilibrar nuevamente.
     wait(3000)
 
 ## Resultados
+
+Tras la realización del código se comprueba el correcto funcionamiento del mismo cargandolo al robot.
+
+La siguiente imagen muestra 3 estados del robot, el de la izquierda el robot "dormido" y esperando a iniciar, en medio el robot "despierto" y ejecutando el proceso, y a la deracha el robot tras sufrir una caída.
+
+![image](https://github.com/DiegoJGutierrezReyes/Mini-Proyecto-Giroboy/assets/132300202/062244ae-94ee-436d-b02e-b9b71d063b15)
+
+Así mismo, se implementó una rutina predetermianda para el robot cuando la variable *bandera=0*, en esta rutina el robot avanzará hacia adelante de forma constante y al detectar un obstáculo con el sensor ultrasónico girará a la derecha o izquierda de forma aleatoria. Este modo se observa en el siguiente video:
+
+VIDEO DEL MODO PREDETERMINADO
+
+Por su parte, cuando *bandera=1* se entra en el modo de programción, donde se ejecutará en bucle la secuencia creada, a esta secuencia se le puede cambiar el orden de las acciones, asi como el tiempo que debe de ejecutarlas. El video de una secuencia programada se muestra a continuación:
+
+VIDEO DE LA RUTINA PROGRAMADA
 
 ## Conclusiones
 
