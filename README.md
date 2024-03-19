@@ -25,10 +25,15 @@ Como se mencionó previamente, el robot cuenta con varias formas de armarse, la 
 La metodología del robot se ve compuesta por los siguientes pasos:
 
   1.- Armar el robot en la configuración "GiroBoy"
+  
   2.- Instalar la extensión de python en Visual Studio Code para su programación.
+  
   3.- Descargar el código fuente del robot, en el cual se emplean los distintos componentes.
+  
   4.- Conectar vís USB el robot a la computadora y cargar el código.
+  
   5.- Verificar el correcto funcionamiento del robot.
+  
   6.- Modificar el código para cumplir con los objetivos establecidos sin el uso del sensor de colores.
 
 ## Código implementado
